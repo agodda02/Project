@@ -35,31 +35,42 @@ def update_pmq_sessions_list(links):
                 pmq_sessions.append(check_link)        
                 
 def write_to_file(pmq_sessions):
-    with open("pmq_links.txt", "a") as f:
+    with open("pmq_links.txt", "w") as f:
         for pmq_session in pmq_sessions:
             f.writelines(pmq_session+'\n')
 
-def change_session(date_to_check, session):
-    if session == "Tuesday":
-        date_to_check += timedelta(days = 2)
-        session = "Thursday"
-    elif session == "Thursday":
+def tuesday_or_thursday(date_to_check):
+    day_of_week = date_to_check.strftime('%A')
+    
+    if day_of_week == "Tuesday":
+        date_to_check += timedelta(days = 2)        
+    elif day_of_week == "Thursday":
         date_to_check += timedelta(days = 5)
-        session = "Tuesday"
-    return (date_to_check, session)    
+        
+    return date_to_check
+
+    # if session == "Tuesday":
+        # date_to_check += timedelta(days = 2)
+        # session = "Thursday"
+    # elif session == "Thursday":
+        # date_to_check += timedelta(days = 5)
+        # session = "Tuesday"
+    # return (date_to_check, session)    
+
+start_time = datetime.now()
 
 date_to_check = date(1961, 7, 18) 
 move_to_wednesdays = date(1997, 5, 20)
 end = date(2022, 6, 29) 
-session = "Tuesday"
+# session = "Tuesday"
 pmq_sessions = list()
 
 while date_to_check <= move_to_wednesdays:    
     links = get_links(date_to_check)
     update_pmq_sessions_list(links)
-    date_to_check, session = change_session(date_to_check, session)
+    date_to_check = tuesday_or_thursday(date_to_check)
 
-    if len(pmq_sessions) == 100:
+    if len(pmq_sessions) == 200:
         write_to_file(pmq_sessions)
         pmq_sessions.clear()
 
@@ -70,8 +81,11 @@ while date_to_check <= end:
     update_pmq_sessions_list(links)
     date_to_check += timedelta(days = 7)    
 
-    if len(pmq_sessions) == 100:
+    if len(pmq_sessions) == 200:
         write_to_file(pmq_sessions)
         pmq_sessions.clear()
 
 write_to_file(pmq_sessions)
+
+end_time = datetime.now()
+print('Duration: {}'.format(end_time - start_time))

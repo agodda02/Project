@@ -9,9 +9,9 @@ class Contribution:
         
         if self.contributor == "The Prime Minister":
             self.contribution_type = "answer"
-        elif self.contributor == "Mr Speaker":          # Examples in every session
+        elif self.contributor == "Mr Speaker":
             self.contribution_type = "interruption"
-        elif self.contributor == "Hon. Members":        # Found an example - view-source:https://hansard.parliament.uk/commons/2022-01-12/debates/3B53E066-9746-4AB8-A8F9-9C08981A8D9B/OralAnswersToQuestions
+        elif self.contributor == "Hon. Members":
             self.contribution_type = "interruption"
         else:
             self.contribution_type = "question"
