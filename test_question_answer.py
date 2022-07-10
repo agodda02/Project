@@ -4,19 +4,31 @@ from Contribution import *
 
 @pytest.fixture
 def soup_1975():
-    with open("example_1975.txt", "r") as f:
+    with open("data/example_1975.txt", "r") as f:
         data = f.read()
     return get_soup(data)  
     
 @pytest.fixture
 def soup_2022_06_22():
-    with open("example_2022_06_22.txt", "r", encoding="utf8") as f:
+    with open("data/example_2022_06_22.txt", "r", encoding="utf8") as f:
         data = f.read()
     return get_soup(data)
 
 @pytest.fixture
 def soup_2022_06_15():
-    with open("example_2022_06_15.txt", "r", encoding="utf8") as f:
+    with open("data/example_2022_06_15.txt", "r", encoding="utf8") as f:
+        data = f.read()
+    return get_soup(data)    
+
+@pytest.fixture
+def soup_1963():
+    with open("data/example_1963.txt", "r", encoding="utf8") as f:
+        data = f.read()
+    return get_soup(data)    
+
+@pytest.fixture
+def soup_1961():
+    with open("data/example_1961.txt", "r", encoding="utf8") as f:
         data = f.read()
     return get_soup(data)    
 
@@ -73,13 +85,71 @@ def test_get_pmq_contributions(soup_2022_06_22):
             interruptions += 1
             
     assert interruptions == 6
-    assert questions == 29    # Presumably an interruption broke a question into two contributions
+    assert questions == 29
     assert answers == 28
-    
 
+def test_deal_with_interruption(soup_2022_06_22):
+    contributions = get_pmq_contributions_raw(soup_2022_06_22)
+    link = '2022-06-22/debates/1825FDB2-5C11-4579-B1DA-94B80654D983/OralAnswersToQuestions'
+    previous_contribution = Contribution(contributions[9], link)
+    contribution = Contribution(contributions[10], link)
+    next_contribution = Contribution(contributions[11], link)    
+    question = 'The Prime Minister has obviously not been to Wakefield recently. He has crashed the economy and he has put everybody’s tax up. The last Tory he sent up to Wakefield was convicted of a sexual assault. That is not much of a pitch, Prime Minister. Talking of people not up to the job, while the Transport Secretary spends his time working on his spreadsheet tracking the Prime Minister’s unpopularity, thousands of families have had their holiday flights cancelled, it takes forever to renew a driving licence or passport and now we have the biggest rail strike in 30 years. If the Prime Minister is genuine— If the Prime Minister is genuine about preventing strikes, will he tell this House how many meetings he or his Transport Secretary have had with rail workers this week to actually stop the strikes?'
+    previous_contribution.concatenate_with(next_contribution.paragraph)
+    assert previous_contribution.paragraph == question
+
+def test_get_questions_and_answers_1(soup_2022_06_22):
+    contributions = get_pmq_contributions_raw(soup_2022_06_22)
+    link = '2022-06-22/debates/1825FDB2-5C11-4579-B1DA-94B80654D983/OralAnswersToQuestions'
+    contribution_objects = get_pmq_contribution_objects(contributions, link)
+    questions_and_answers = get_questions_and_answers(contribution_objects)
+    questions = get_questions(questions_and_answers)
+    answers = get_answers(questions_and_answers)
+    assert len(questions_and_answers) == 54
+    assert len(questions) == 27
+    assert len(answers) == 27
     
-# def test_deal_with_speaker_pm_interruption(soup_22):
-    # contributions = get_contributions(soup_22)
+def test_get_questions_and_answers_2(soup_2022_06_15):
+    contributions = get_pmq_contributions_raw(soup_2022_06_15)
+    link = '2022-06-15/debates/20D19FB5-2111-49A8-94A1-9E43AAC5CD38/OralAnswersToQuestions'
+    contribution_objects = get_pmq_contribution_objects(contributions, link)
+    questions_and_answers = get_questions_and_answers(contribution_objects)
+    questions = get_questions(questions_and_answers)
+    answers = get_answers(questions_and_answers)
+    assert len(questions) == 26
+    assert len(answers) == 26
+        
+def test_get_questions_and_answers_3(soup_1975):    
+    contributions = get_pmq_contributions_raw(soup_1975)
+    link = '1975-01-14/debates/e0279e7f-6655-463f-ae5a-e39aa443a117/OralAnswersToQuestions'
+    contribution_objects = get_pmq_contribution_objects(contributions, link)
+    questions_and_answers = get_questions_and_answers(contribution_objects)
+    questions = get_questions(questions_and_answers)
+    answers = get_answers(questions_and_answers)
+    assert len(questions) == 14
+    assert len(answers) == 14
+        
+def test_get_question_answer_pairs(soup_1975):
+    link = '1975-01-14/debates/e0279e7f-6655-463f-ae5a-e39aa443a117/OralAnswersToQuestions'
+    question_answer_pairs = get_question_answer_pairs(soup_1975, link)
+    assert len(question_answer_pairs) == 14
     
-    # answer = 'This is the Government who love the railways and who invest in the railways. We are putting £96 billion into the integrated railway plan. I am proud to have built Crossrail, by the way, and we are going to build Northern Powerhouse Rail, but we have got to modernise our railways. It is a disgrace, when we are planning to make sure that we do not have ticket offices that sell fewer than one ticket every hour, that yesterday the right hon. and learned Gentleman had 25 Labour MPs out on the picket line, defying instructions—[Interruption.] There were 25 Labour MPs and the shadow deputy leader out on the picket line, backing the strikers, while we back the strivers.'
+def test_get_question_answer_pairs_2(soup_1963):
+    link = '1975-01-14/debates/e0279e7f-6655-463f-ae5a-e39aa443a117/OralAnswersToQuestions'
+    question_answer_pairs = get_question_answer_pairs(soup_1963, link)
+    assert len(question_answer_pairs) == 16
     
+    question = "asked the Prime Minister if he will take steps to set up a Department of Disarmament with a senior Minister in charge of it."
+    answer = "No, Sir. Disarmament is closely linked with the fundamental responsibilities of the Foreign Secretary and the Minister of Defence.  My hon. Friend the Minister of State for Foreign Affairs already has special responsibility, under the Foreign Secretary, for disarmament and devotes a very large part of his time to it."
+    
+    assert question_answer_pairs[10][0].paragraph == question
+    assert question_answer_pairs[10][1].paragraph == answer
+    
+def test_regex():
+    head = 'https://hansard.parliament.uk/Commons/'
+    link = '1961-07-18/debates/adf428ba-7690-44bf-999c-635b980254fe/OralAnswersToQuestions'
+    page = get_page(head + link)
+    soup = get_soup(page)
+    question_answer_pairs = get_question_answer_pairs(soup, link)    
+    answer = 'My right hon. Friend the Lord Privy Seal has visited  Nicosia for this purpose, and had talks with Cyprus Ministers.'
+    assert question_answer_pairs[2][1].paragraph == answer

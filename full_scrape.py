@@ -49,20 +49,11 @@ def tuesday_or_thursday(date_to_check):
         
     return date_to_check
 
-    # if session == "Tuesday":
-        # date_to_check += timedelta(days = 2)
-        # session = "Thursday"
-    # elif session == "Thursday":
-        # date_to_check += timedelta(days = 5)
-        # session = "Tuesday"
-    # return (date_to_check, session)    
-
 start_time = datetime.now()
 
 date_to_check = date(1961, 7, 18) 
 move_to_wednesdays = date(1997, 5, 20)
 end = date(2022, 6, 29) 
-# session = "Tuesday"
 pmq_sessions = list()
 
 while date_to_check <= move_to_wednesdays:    
