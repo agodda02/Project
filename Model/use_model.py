@@ -2,6 +2,9 @@ from gensim import corpora, matutils
 from gensim.models import LsiModel
 import string_split
 import numpy as np
+
+import sys
+sys.path.append("..")
 import database as db
 
 lsi = LsiModel.load("lsi.model")

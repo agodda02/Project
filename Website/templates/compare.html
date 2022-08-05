@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Compare Past Prime Ministers</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+	</head>
+	<body>
+		<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+			<div class="container-fluid">
+				<div class="collapse navbar-collapse" id="navbarColor01">			
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{url_for('main')}}">Home</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{url_for('search')}}">Search the Archives</a>
+						</li>										
+						<li class="nav-item">
+							<a class="nav-link active" aria-current="page" href="{{url_for('compare')}}">Compare Prime Ministers</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" aria-current="page" href="{{url_for('upload')}}">Upload Question &#38; Answer</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+				<a class="navbar-brand pull-right" href="#">Answer Relevance at PMQs</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+		</nav>
+		<div class="container text-center mt-4">		
+			<div class="d-grid gap-3">
+				<div class="p-2 mt-5">
+					<h1 class="h1">Compare Past Prime Ministers</h2>
+					<p>Choose two Prime Ministers to compare</p>
+				</div>
+				<div class="container"> 
+				{% for row in primeministers|batch(5): %} 
+					<div class = "row row-cols-5"> 
+					{% for primeminister in row %}
+						<span class="clickable not-clicked">
+							<div class="col gx-2">
+								<div class="p-2">
+									<img src="static/{{ primeminister['name'].split()[0][:1].lower() + primeminister['name'].split()[1].lower() }}.jpg"
+									class="img-thumbnail" alt={{ primeminister['name'] }} />
+								</div>
+								<div class="p-2">
+									<p class="fs-5 fw-bold">{{ primeminister['name'] }}</p>	
+									<hr />
+									<p class="fs-6 pt-0">{{primeminister['startdate'].strftime("%d %B %Y")}}
+									<br />
+									to 
+									<br />
+									{% if primeminister['enddate'] == None %} Present {% else %} {{primeminister['enddate'].strftime("%d %B %Y")}} {% endif %}</p>
+								</div>
+							</div>
+						</span>
+						{% endfor %}
+					</div>
+				{% endfor %}				
+				</div>
+			</div>						
+		</div>
+		<script>
+			var count = 0;
+			$(".clickable").click(function(){
+				if ($(this).hasClass('not-clicked') && count >= 2){
+					$(this).removeClass('not-clicked');
+					$(this).addClass('clicked border border-danger border-3');
+					count += 1;
+				} else if ($(this).hasClass('not-clicked')) {
+					$(this).removeClass('not-clicked');
+					$(this).addClass('clicked border border-success border-3');
+					count += 1;
+				} else if ($(this).hasClass('border-success')) {
+					$(this).removeClass('clicked border border-success border-3');
+					$(this).addClass('not-clicked');
+					count -= 1;
+				} else {
+					$(this).removeClass('clicked');
+					$(this).addClass('not-clicked');
+					$(this).removeClass('clicked border border-danger border-3');
+					count -= 1;
+				}
+				/* Need to add code to turn box from red to green when a green box is removed */
+			});
+		</script>
+	</body>
+</html>
