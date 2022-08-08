@@ -69,6 +69,9 @@ def results():
     cursor.execute('SELECT author, date, question, answer, answer_relevance FROM qa_pairs WHERE pm=%s and date >= %s and date <= %s', (pm_id, datefrom, dateto))
     data = cursor.fetchall()
     
+    for items in data:
+        items['answer_relevance'] = f"{items['answer_relevance']:.2%}"
+    
     return render_template('results.html', average=average, pm=pm, data=data, datefrom=datefrom.strftime("%A %d %B %Y"), dateto=dateto.strftime("%A %d %B %Y"))
 
 @app.route("/compare")

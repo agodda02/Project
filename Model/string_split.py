@@ -12,6 +12,6 @@ def split_contribution(lowercase_contribution):
             buffer += lowercase_contribution[i]
         else:
             if len(buffer) > 0 and buffer not in stop_words:
-                words.append(buffer)   
+                words.append(buffer)
             buffer = ''
     return words   

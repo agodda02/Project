@@ -57,7 +57,7 @@
 			<div class="container-fluid">
 				{% for row in data %}
 				<div class="container">
-				<h6 class="h6">{{row['author']}} ({{row['date']}})</h6>
+				<h6 class="h6">{{row['author']}} ({{row['date'].strftime("%d/%m/%Y")}})</h6>
 				<p>{{row['question']}}</p>
 				<h6 class="h6">{{pm['name']}}</h6>
 				<p>{{row['answer']}}</p>

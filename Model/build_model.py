@@ -1,7 +1,10 @@
 from gensim import corpora, models
 from gensim.models import LsiModel
-import database as db
 import string_split
+
+import sys
+sys.path.append("..")
+import database as db
 
 mydb = db.connect()
 mycursor = mydb.cursor()
@@ -22,10 +25,11 @@ print("Getting dictionary")
 dictionary = corpora.Dictionary(contributions)
 
 print("Getting corpus")
-corpus = [dictionary.doc2bow(contribution) for contribution in contributions]
+corpus = [dictionary.doc2bow(contribution, allow_update=True) for contribution in contributions]
+# corpus_tfidf = models.TfidfModel(corpus, smartirs='ntc') - look at using this for improving model. Add allow_update=True in doc2bow method above
 
 print("Getting model")
-lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=400)
+lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=75)
 
 print("Saving the model and dictionary")
 lsi.save("lsi.model")
