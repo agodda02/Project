@@ -34,17 +34,11 @@
 		<div class="container text-center mt-4">		
 			<div class="d-grid gap-3">
 				<div class="p-2 mt-5">
-					<h1 class="h1">Upload Question &#38; Answer</h2>
+					<h1 class="h1">Your Question &#38; Answer Score</h2>
 				</div>
-				<div class="input-group justify-content-center">		
-					<form action="{{url_for('result')}}" method="post" id="qa_pair">
-						<label for="question">Question:</label><br/>
-						<textarea id="question" name="question" form="qa_pair" rows="6" cols="50"></textarea><br/>
-						<label for="answer">Answer:</label><br/>
-						<textarea id="answer" name="answer" form="qa_pair" rows="6" cols="50"></textarea><br/>
-						<button type="submit" form="qa_pair" value="Calculate">Calculate</button><br/>
-					</form>
-				</div>
+				<p class="text-start"><strong>Question:</strong> {{ question }}</p>
+				<p class="text-start"><strong>Answer:</strong> {{ answer }}</p>
+				<p><strong>Relevance Score: {{ relevance }}</strong></p>
 			</div>						
 		</div>
 	</body>

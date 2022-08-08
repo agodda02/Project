@@ -3,7 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Upload Question & Answer</title>
+		<title>Search Results</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 	</head>
 	<body>
@@ -15,13 +16,13 @@
 							<a class="nav-link" aria-current="page" href="{{url_for('main')}}">Home</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" aria-current="page" href="{{url_for('search')}}">Search the Archives</a>
-						</li>						
+							<a class="nav-link active" aria-current="page" href="{{url_for('search')}}">Search the Archives</a>
+						</li>										
 						<li class="nav-item">
 							<a class="nav-link" aria-current="page" href="{{url_for('compare')}}">Compare Prime Ministers</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="{{url_for('upload')}}">Upload Question &#38; Answer</a>
+							<a class="nav-link" aria-current="page" href="{{url_for('upload')}}">Upload Question &#38; Answer</a>
 						</li>
 					</ul>
 				</div>
@@ -34,18 +35,36 @@
 		<div class="container text-center mt-4">		
 			<div class="d-grid gap-3">
 				<div class="p-2 mt-5">
-					<h1 class="h1">Upload Question &#38; Answer</h2>
+					<h1 class="h1">Results for {{ pm['name'] }}</h1>
+					<h2 class="h2">From {{ datefrom }} to {{dateto}}</h2>
 				</div>
-				<div class="input-group justify-content-center">		
-					<form action="{{url_for('result')}}" method="post" id="qa_pair">
-						<label for="question">Question:</label><br/>
-						<textarea id="question" name="question" form="qa_pair" rows="6" cols="50"></textarea><br/>
-						<label for="answer">Answer:</label><br/>
-						<textarea id="answer" name="answer" form="qa_pair" rows="6" cols="50"></textarea><br/>
-						<button type="submit" form="qa_pair" value="Calculate">Calculate</button><br/>
-					</form>
+				<div class="container"> 
+						<span>
+							<div class="col gx-2">
+								<div class="p-2">
+									<img src="static/{{ pm['name'].split()[0][:1].lower() + pm['name'].split()[1].lower() }}.jpg"
+									class="img-thumbnail" alt={{ pm['name'] }} />
+								</div>
+								<div class="p-2">
+									<p class="fs-5 fw-bold">{{ pm['name'] }}</p>	
+									<p class="fs-6 pt-0">Average Answer Relevance: {{ average }}</p>
+								</div>
+							</div>
+						</span>
+					</div>
 				</div>
-			</div>						
-		</div>
+			</div>
+			<div class="container-fluid">
+				{% for row in data %}
+				<div class="container">
+				<h6 class="h6">{{row['author']}} ({{row['date']}})</h6>
+				<p>{{row['question']}}</p>
+				<h6 class="h6">{{pm['name']}}</h6>
+				<p>{{row['answer']}}</p>
+				<p><strong>Answer relevance: </strong>{{ row['answer_relevance'] }}</p>
+				</div>
+				<hr />
+				{% endfor %}
+			</div>			
 	</body>
 </html>

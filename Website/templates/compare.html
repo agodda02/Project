@@ -38,11 +38,18 @@
 					<h1 class="h1">Compare Past Prime Ministers</h2>
 					<p>Choose two Prime Ministers to compare</p>
 				</div>
+				<div class="input-group invisible justify-content-center" id="compare-button">		
+						<form action="{{url_for('comparison')}}" method="post" id="compare">
+						  <input type="text" id="pm1" name="pm1" class="d-none" value="" /> 
+						  <input type="text" id="pm2" name="pm2" class="d-none" value="" /> 
+						  <button type="submit" form="compare" value="Compare">Compare</button>
+						</form>
+				</div>
 				<div class="container"> 
 				{% for row in primeministers|batch(5): %} 
 					<div class = "row row-cols-5"> 
 					{% for primeminister in row %}
-						<span class="clickable not-clicked">
+						<span class="clickable not-clicked" id="{{ primeminister['id'] }}">
 							<div class="col gx-2">
 								<div class="p-2">
 									<img src="static/{{ primeminister['name'].split()[0][:1].lower() + primeminister['name'].split()[1].lower() }}.jpg"
@@ -66,27 +73,85 @@
 			</div>						
 		</div>
 		<script>
-			var count = 0;
+			let pms = [];
 			$(".clickable").click(function(){
-				if ($(this).hasClass('not-clicked') && count >= 2){
+				if ($(this).hasClass('not-clicked') && pms.length >= 2){
 					$(this).removeClass('not-clicked');
 					$(this).addClass('clicked border border-danger border-3');
-					count += 1;
+					pms.push($(this).attr('id'));
+					button = document.getElementById('compare-button');
+					$(button).addClass('invisible');
 				} else if ($(this).hasClass('not-clicked')) {
 					$(this).removeClass('not-clicked');
 					$(this).addClass('clicked border border-success border-3');
-					count += 1;
-				} else if ($(this).hasClass('border-success')) {
+					pms.push($(this).attr('id'));
+					if (pms.length == 2) {
+						button = document.getElementById('compare-button');
+						$(button).removeClass('invisible');
+						/* Set the values for pm1 and pm2 */
+						document.getElementById('pm1').value = pms[0];
+						document.getElementById('pm2').value = pms[1];
+					} else {
+						button = document.getElementById('compare-button');
+						$(button).addClass('invisible');
+					}
+				} else if ($(this).hasClass('clicked border border-danger border-3') && pms.length == 3) {
+					$(this).removeClass('clicked border border-danger border-3');
+					$(this).addClass('not-clicked');
+					pms = pms.filter(e => e !== $(this).attr('id'));
+					elements = document.getElementsByClassName('clicked border border-danger border-3');
+					
+					Array.from(elements).forEach(function (element){
+						$(element).removeClass('border-danger');
+						$(element).addClass('border-success');					
+					});
+										
+					button = document.getElementById('compare-button');
+					$(button).removeClass('invisible');
+				} else if ($(this).hasClass('clicked border border-success border-3')) {
 					$(this).removeClass('clicked border border-success border-3');
 					$(this).addClass('not-clicked');
-					count -= 1;
+					
+					pms = pms.filter(e => e !== $(this).attr('id'));
+					if (pms.length == 2){
+						elements = document.getElementsByClassName('clicked border border-danger border-3');
+						
+						Array.from(elements).forEach(function (element){
+							$(element).removeClass('border-danger');
+							$(element).addClass('border-success');					
+						});
+						
+						button = document.getElementById('compare-button');
+						$(button).removeClass('invisible');
+						/* set values for pm1 and pm2 inputs */
+						document.getElementById('pm1').value = pms[0];
+						document.getElementById('pm2').value = pms[1];
+					} else {
+						button = document.getElementById('compare-button');
+						$(button).addClass('invisible');
+					}
 				} else {
-					$(this).removeClass('clicked');
+					$(this).removeClass('clicked border border-success border-3');
 					$(this).addClass('not-clicked');
-					$(this).removeClass('clicked border border-danger border-3');
-					count -= 1;
+					pms = pms.filter(e => e !== $(this).attr('id'));					
+					if (pms.length == 2){
+						elements = document.getElementsByClassName('clicked border border-danger border-3');
+						
+						Array.from(elements).forEach(function (element){
+							$(element).removeClass('border-danger');
+							$(element).addClass('border-success');					
+						});
+						
+						button = document.getElementById('compare-button');
+						$(button).removeClass('invisible');
+						/* set values for pm1 and pm2 inputs */
+						document.getElementById('pm1').value = pms[0];
+						document.getElementById('pm2').value = pms[1];
+					} else {
+						button = document.getElementById('compare-button');
+						$(button).addClass('invisible');
+					}
 				}
-				/* Need to add code to turn box from red to green when a green box is removed */
 			});
 		</script>
 	</body>

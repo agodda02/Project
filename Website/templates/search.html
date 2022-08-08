@@ -39,11 +39,32 @@
 					<h1 class="h1">Search the Archives</h2>
 					<p>Pick a Prime Minister and then select a date range</p>
 				</div>
+
+				{% for primeminister in primeministers %}
+				<div class="input-group d-none justify-content-center" id="daterange{{ primeminister['id'] }}">		
+					<form action="{{url_for('results')}}" method="post" id="search{{ primeminister['id'] }}">
+						<input type="text" id="pm{{ primeminister['id'] }}" name="pm{{ primeminister['id'] }}" class="d-none" value="" />
+						<label for="from">From:</label>
+						<input type="date" id="from" name="from" 
+						value="{{ primeminister['startdate'].strftime("%Y-%m-%d") }}" 
+						min="{{ primeminister['startdate'].strftime("%Y-%m-%d") }}" 
+						{% if primeminister['enddate'] != None %} max="{{ primeminister['enddate'].strftime("%Y-%m-%d") }}" {% endif %} />
+						<label for="to"> To:</label>
+						<input type="date" id="to" name="to" 
+						min="{{ primeminister['startdate'].strftime("%Y-%m-%d") }}" 
+						{% if primeminister['enddate'] != None %} 
+						max="{{ primeminister['enddate'].strftime("%Y-%m-%d") }}" 
+						value="{{ primeminister['enddate'].strftime("%Y-%m-%d") }}"
+						{% endif %} >
+						<button type="submit" form="search{{ primeminister['id'] }}" value="Submit">Submit</button>
+					</form>
+				</div>
+				{% endfor %}
 				<div class="container"> 
 				{% for row in primeministers|batch(5): %} 
 					<div class = "row row-cols-5"> 
 					{% for primeminister in row %}
-						<span class="clickable not-clicked">
+						<span class="clickable not-clicked" id="{{ primeminister['id'] }}">
 							<div class="col gx-2">
 								<div class="p-2">
 									<img src="static/{{ primeminister['name'].split()[0][:1].lower() + primeminister['name'].split()[1].lower() }}.jpg"
@@ -67,22 +88,72 @@
 			</div>						
 		</div>	
 		<script>
-			var count = 0;
+			let pms = [];
 			$(".clickable").click(function(){
-				if ($(this).hasClass('not-clicked') && count >= 1){
+				if ($(this).hasClass('not-clicked') && pms.length >= 1){
 					$(this).removeClass('not-clicked');
 					$(this).addClass('clicked border border-danger border-3');
-					count += 1;
+					pms.push($(this).attr('id'));
+					elements = document.getElementsByClassName('clicked');
+					Array.from(elements).forEach(function (element){
+						if ($(element).hasClass('border-success')){
+							$(element).removeClass('border-success');
+							$(element).addClass('border-danger');
+						}
+						form = document.getElementById('daterange' + $(element).attr('id'));					
+						$(form).addClass('d-none');
+					});
 				} else if ($(this).hasClass('not-clicked')) {
 					$(this).removeClass('not-clicked');
 					$(this).addClass('clicked border border-success border-3');
-					count += 1;
+					pms.push($(this).attr('id'));
+					form = document.getElementById('daterange' + $(this).attr('id'));
+					$(form).removeClass('d-none');
+					document.getElementById('pm' + $(this).attr('id')).setAttribute('value', pms[0]);
+				} else if ($(this).hasClass('clicked border border-danger border-3') && pms.length == 2) {
+					$(this).removeClass('clicked border border-danger border-3');
+					$(this).addClass('not-clicked');
+					form = document.getElementById('daterange' + $(this).attr('id'));
+					$(form).addClass('d-none');
+					pms = pms.filter(e => e !== $(this).attr('id'));
+					elements = document.getElementsByClassName('clicked border border-danger border-3');
+					element = elements[0];
+					form = document.getElementById('daterange' + $(element).attr('id'));
+					$(form).removeClass('d-none');
+					$(element).removeClass('border-danger');
+					$(element).addClass('border-success');
+					document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
+				} else if ($(this).hasClass('clicked border border-success border-3')) {
+					$(this).removeClass('clicked border border-success border-3');
+					$(this).addClass('not-clicked');
+					form = document.getElementById('daterange' + $(this).attr('id'));
+					$(form).addClass('d-none');					
+					pms = pms.filter(e => e !== $(this).attr('id'));
+					if (pms.length == 1){
+						elements = document.getElementsByClassName('clicked border border-danger border-3');
+						element = elements[0];
+						form = document.getElementById('daterange' + $(element).attr('id'));
+						$(form).removeClass('d-none');
+						$(element).removeClass('border-danger');
+						$(element).addClass('border-success');
+						document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
+					}
 				} else {
 					$(this).removeClass('clicked border border-success border-3');
 					$(this).addClass('not-clicked');
-					count = 0;
+					form = document.getElementById('daterange' + $(this).attr('id'));
+					$(form).addClass('d-none');					
+					pms = pms.filter(e => e !== $(this).attr('id'));
+					if (pms.length == 1){
+						elements = document.getElementsByClassName('clicked border border-danger border-3');
+						element = elements[0];
+						form = document.getElementById('daterange' + $(element).attr('id'));
+						$(form).removeClass('d-none');
+						$(element).removeClass('border-danger');
+						$(element).addClass('border-success');
+						document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
+					}
 				}
-				/* Need to add code to turn box from red to green when a green box is removed */
 			});
 		</script>		
 	</body>
