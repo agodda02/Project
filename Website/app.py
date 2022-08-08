@@ -12,7 +12,7 @@ import sys
 sys.path.append("..")
 import database as db
 
-sys.path.append("/Model")
+sys.path.append("../Model")
 import string_split
 
 app = Flask(__name__)
