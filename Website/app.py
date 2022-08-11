@@ -1,23 +1,43 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# IMPORTS
+
+# Used Globally
 from flask import Flask, render_template, url_for, request
 from flask_mysqldb import MySQL
-from flask_bootstrap import Bootstrap
-from flask_datepicker import datepicker
-from datetime import date
-from gensim import corpora, matutils
-from gensim.models import LsiModel
-import numpy as np
+
+# Used when the database is being queried
 import MySQLdb.cursors
 
+# Used in results function to manipulate the dates data
+from datetime import date
+
+# Used to load in the LSI Model
+from gensim.models import LsiModel
+
+# Used to load in the LDA model, if used
+# from gensim.models import LdaModel
+
+# If KeyBERT is being used
+# from keybert import KeyBERT
+# from nltk.corpus import stopwords
+
+# Used to calculate the cosine similarity
+from gensim import corpora, matutils
+import numpy as np
+
+# Changes the path, so that the database module can be imported
 import sys
 sys.path.append("..")
 import database as db
 
+# Changes the path, so that the string_split module can be imported
 sys.path.append("../Model")
 import string_split
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+# The application begins...
 app = Flask(__name__)
-Bootstrap(app)
-datepicker(app)
 mysql = MySQL()
 
 host, user, password, database = db.get_credentials()
@@ -107,23 +127,51 @@ def upload():
 @app.route("/result", methods=['POST'])
 def result():
     lsi = LsiModel.load("../Model/lsi.model")
+    # lsi = LdaModel.load("../Model/lda.model")
     dictionary = corpora.Dictionary.load("../Model/dictionary")
     
     question = request.form['question']
     answer = request.form['answer']
 
-    question_split = string_split.split_contribution(question.lower())
-    answer_split = string_split.split_contribution(answer.lower())
+    # If KeyBERT is used...
+    # stop_words = set(stopwords.words('english'))
+    # additional = list()
+
+    # with open("../Model/pmq_stop_words.txt", "r") as f:
+            # for line in f.readlines():
+                # additional.append(line.strip())
+    
+    # stop_words.update(additional)
+    
+    # kw_model = KeyBERT()
+    # question_keywords = kw_model.extract_keywords(question, stop_words=stop_words)
+    # answer_keywords = kw_model.extract_keywords(answer, stop_words=stop_words)
+    
+    # question_split = list()
+    # for keyword in question_keywords:
+        # question_split.append(keyword[0])
+
+    # answer_split = list()
+    # for keyword in answer_keywords:
+        # answer_split.append(keyword[0])
+    
+    question_split = string_split.split_contribution(question.lower(), "../Model/pmq_stop_words.txt")
+    answer_split = string_split.split_contribution(answer.lower(), "../Model/pmq_stop_words.txt")
     question_bow = dictionary.doc2bow(question_split)
     answer_bow = dictionary.doc2bow(answer_split)
     question_lsi = lsi[question_bow]
     answer_lsi = lsi[answer_bow]
-
-    c = matutils.sparse2full(question_lsi, 400)
-    d = matutils.sparse2full(answer_lsi, 400)
+        
+    c = matutils.sparse2full(question_lsi, 300)
+    d = matutils.sparse2full(answer_lsi, 300)
 
     try:
-        sim = np.dot(c, d) / (np.linalg.norm(c) * np.linalg.norm(d))
+        dot_product = np.dot(c, d)
+        norm_c = np.linalg.norm(c)
+        norm_d = np.linalg.norm(d)       
+        sim = dot_product / (norm_c * norm_d)
+        if sim < 0:
+            sim = 0
     except:
         sim = 0
         

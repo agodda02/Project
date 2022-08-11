@@ -1,9 +1,15 @@
 from nltk.corpus import stopwords
 
-stop_words = set(stopwords.words('english'))
-stop_words.update(['speaker', 'hon', 'right', 'minister', 'prime', 'friend', 'government', 'gentleman', 'house', 'mr'])
+def split_contribution(lowercase_contribution, file):
+    stop_words = set(stopwords.words('english'))
+    additional = list()
 
-def split_contribution(lowercase_contribution):
+    with open(file, "r") as f:
+            for line in f.readlines():
+                additional.append(line.strip())
+
+    stop_words.update(additional)
+
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     words = list()
     buffer = ''    

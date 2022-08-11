@@ -22,24 +22,24 @@ for row in mycursor:
     question = row[1]
     answer = row[3]
     answer_relevance = row[5]
-    question_split = string_split.split_contribution(question.lower())
-    answer_split = string_split.split_contribution(answer.lower())
+    question_split = string_split.split_contribution(question.lower(), "pmq_stop_words.txt")
+    answer_split = string_split.split_contribution(answer.lower(), "pmq_stop_words.txt")
     print(index)
     question_bow = dictionary.doc2bow(question_split)
     answer_bow = dictionary.doc2bow(answer_split)
     question_lsi = lsi[question_bow]
     answer_lsi = lsi[answer_bow]
 
-    c = matutils.sparse2full(question_lsi, 75)
-    d = matutils.sparse2full(answer_lsi, 75)
-    minx = -1
-    maxx = 1
+    c = matutils.sparse2full(question_lsi, 300)
+    d = matutils.sparse2full(answer_lsi, 300)
 
     try:
         dot_product = np.dot(c, d)
         norm_c = np.linalg.norm(c)
         norm_d = np.linalg.norm(d)       
-        sim = ((dot_product / (norm_c * norm_d)) - minx)/(maxx-minx)
+        sim = dot_product / (norm_c * norm_d)
+        if sim < 0:
+            sim = 0
     except:
         sim = 0
         

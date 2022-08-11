@@ -1,5 +1,6 @@
 from gensim import corpora, models
 from gensim.models import LsiModel
+from gensim.models import LdaModel
 import string_split
 
 import sys
@@ -17,7 +18,7 @@ contributions = list()
 for rows in mycursor:
     lowercase_contribution = rows[0].lower()
     print(lowercase_contribution)
-    words = string_split.split_contribution(lowercase_contribution)
+    words = string_split.split_contribution(lowercase_contribution, "pmq_stop_words.txt")
     print(words)
     contributions.append(words)
 
@@ -26,11 +27,14 @@ dictionary = corpora.Dictionary(contributions)
 
 print("Getting corpus")
 corpus = [dictionary.doc2bow(contribution, allow_update=True) for contribution in contributions]
-# corpus_tfidf = models.TfidfModel(corpus, smartirs='ntc') - look at using this for improving model. Add allow_update=True in doc2bow method above
+tfidf = models.TfidfModel(corpus)
+corpus_tfidf = tfidf[corpus]
 
 print("Getting model")
-lsi = models.LsiModel(corpus, id2word=dictionary, num_topics=75)
+lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=300)
+# lda = LdaModel(corpus_tfidf, num_topics=300)
 
 print("Saving the model and dictionary")
 lsi.save("lsi.model")
+# lda.save("lda.model")
 dictionary.save("dictionary")
