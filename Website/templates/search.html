@@ -91,7 +91,7 @@
 			function hasNotBeenClicked(element){
 				return element.hasClass('not-clicked')
 			}
-			
+
 			function hasRedBorder(element){
 				return element.hasClass('border-danger')
 			}
@@ -139,12 +139,18 @@
 				element.removeClass('border-success');
 				element.addClass('border-danger');		
 			}
+			
+			function getClickedElement(){
+				elements = document.getElementsByClassName('clicked');
+				element = elements[0];
+				return element;
+			}
 		
-			let pms = [];
+			let activatedElements = [];
 			$(".clickable").click(function(){
-				if (hasNotBeenClicked($(this)) && pms.length >= 1){
+				if (hasNotBeenClicked($(this)) && activatedElements.length >= 1){
 					addRedBorderTo($(this));
-					pms.push($(this).attr('id'));
+					activatedElements.push($(this).attr('id'));
 					elements = document.getElementsByClassName('clicked');
 					Array.from(elements).forEach(function (element){
 						if ($(element).hasClass('border-success')){
@@ -154,43 +160,23 @@
 					});
 				} else if (hasNotBeenClicked($(this))) {
 					addGreenBorderTo($(this));
-					pms.push($(this).attr('id'));		
+					activatedElements.push($(this).attr('id'));		
 					showFormFor($(this));
-					document.getElementById('pm' + $(this).attr('id')).setAttribute('value', pms[0]);
-				} else if (hasRedBorder($(this)) && pms.length == 2) {
-					removeRedBorderFrom($(this));
-					pms = pms.filter(e => e !== $(this).attr('id'));
-					elements = document.getElementsByClassName('clicked');
-					element = elements[0];
-					showFormFor($(element));
-					document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
-					if (hasRedBorder($(element))){
-						changeRedBorderToGreen($(element));
-					}
+					document.getElementById('pm' + $(this).attr('id')).setAttribute('value', activatedElements[0]);
 				} else if (hasGreenBorder($(this))) {
 					removeGreenBorderFrom($(this));
-					pms = pms.filter(e => e !== $(this).attr('id'));
-					hideFormFor($(this));
-					if (pms.length == 1){
-						elements = document.getElementsByClassName('clicked border border-danger border-3');
-						element = elements[0];
-						showFormFor($(element));
-						changeRedBorderToGreen($(element));
-						document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
-					}
-				} else {
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));
+					hideFormFor($(this));			
+				} else if (hasRedBorder($(this)) && activatedElements.length == 2) {
 					removeRedBorderFrom($(this));
-					pms = pms.filter(e => e !== $(this).attr('id'));
-					hideFormFor($(this));
-					if (pms.length == 1){
-						elements = document.getElementsByClassName('clicked');
-						element = elements[0];
-						showFormFor($(element));
-						document.getElementById('pm' + $(element).attr('id')).setAttribute('value', pms[0]);
-						if (hasRedBorder($(element))){
-							changeRedBorderToGreen($(element));
-						}
-					}
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));
+					element = getClickedElement();
+					changeRedBorderToGreen($(element));
+					showFormFor($(element));
+					document.getElementById('pm' + $(element).attr('id')).setAttribute('value', activatedElements[0]);
+				} else if (hasRedBorder($(this)) && activatedElements.length > 2){
+					removeRedBorderFrom($(this));
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));
 				}
 			});
 		</script>		

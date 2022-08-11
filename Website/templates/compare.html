@@ -73,83 +73,102 @@
 			</div>						
 		</div>
 		<script>
-			let pms = [];
+			function hasNotBeenClicked(element){
+				return element.hasClass('not-clicked')
+			}	
+
+			function addGreenBorderTo(element){
+				element.removeClass('not-clicked');
+				element.addClass('clicked border border-success border-3');
+			}
+			
+			function removeGreenBorderFrom(element){
+				element.removeClass('clicked border border-success border-3');
+				element.addClass('not-clicked');			
+			}			
+			
+			function addRedBorderTo(element){
+				element.removeClass('not-clicked');
+				element.addClass('clicked border border-danger border-3');
+			}	
+
+			function removeRedBorderFrom(element){
+				element.removeClass('clicked border border-danger border-3');
+				element.addClass('not-clicked');
+			}			
+			
+			function hasRedBorder(element){
+				return element.hasClass('border-danger')
+			}
+			
+			function hasGreenBorder(element){
+				return element.hasClass('border-success')
+			}	
+
+			function changeRedBorderToGreen(element){
+				element.removeClass('border-danger');
+				element.addClass('border-success');			
+			}			
+			
+			function hideCompareButton(){
+				button = document.getElementById('compare-button');
+				$(button).addClass('invisible');			
+			}
+			
+			function showCompareButton(){
+				button = document.getElementById('compare-button');
+				$(button).removeClass('invisible');			
+			}
+			
+			function changeRedElementsToGreen(){
+				elements = document.getElementsByClassName('border-danger');
+				Array.from(elements).forEach(function (element){
+					changeRedBorderToGreen($(element));					
+				});									
+			}
+			
+			function setComparisonValues(){
+				document.getElementById('pm1').value = activatedElements[0];
+				document.getElementById('pm2').value = activatedElements[1];			
+			}
+		
+			let activatedElements = [];
 			$(".clickable").click(function(){
-				if ($(this).hasClass('not-clicked') && pms.length >= 2){
-					$(this).removeClass('not-clicked');
-					$(this).addClass('clicked border border-danger border-3');
-					pms.push($(this).attr('id'));
-					button = document.getElementById('compare-button');
-					$(button).addClass('invisible');
-				} else if ($(this).hasClass('not-clicked')) {
-					$(this).removeClass('not-clicked');
-					$(this).addClass('clicked border border-success border-3');
-					pms.push($(this).attr('id'));
-					if (pms.length == 2) {
-						button = document.getElementById('compare-button');
-						$(button).removeClass('invisible');
-						/* Set the values for pm1 and pm2 */
-						document.getElementById('pm1').value = pms[0];
-						document.getElementById('pm2').value = pms[1];
-					} else {
-						button = document.getElementById('compare-button');
-						$(button).addClass('invisible');
+				if (hasNotBeenClicked($(this)) && activatedElements.length >= 2){
+					addRedBorderTo($(this));
+					activatedElements.push($(this).attr('id'));
+					hideCompareButton();
+				} else if (hasNotBeenClicked($(this))) {
+					addGreenBorderTo($(this));
+					activatedElements.push($(this).attr('id'));
+					if (activatedElements.length == 2) {
+						showCompareButton();
+						setComparisonValues();
 					}
-				} else if ($(this).hasClass('clicked border border-danger border-3') && pms.length == 3) {
-					$(this).removeClass('clicked border border-danger border-3');
-					$(this).addClass('not-clicked');
-					pms = pms.filter(e => e !== $(this).attr('id'));
-					elements = document.getElementsByClassName('clicked border border-danger border-3');
-					
-					Array.from(elements).forEach(function (element){
-						$(element).removeClass('border-danger');
-						$(element).addClass('border-success');					
-					});
-										
-					button = document.getElementById('compare-button');
-					$(button).removeClass('invisible');
-				} else if ($(this).hasClass('clicked border border-success border-3')) {
-					$(this).removeClass('clicked border border-success border-3');
-					$(this).addClass('not-clicked');
-					
-					pms = pms.filter(e => e !== $(this).attr('id'));
-					if (pms.length == 2){
-						elements = document.getElementsByClassName('clicked border border-danger border-3');
-						
-						Array.from(elements).forEach(function (element){
-							$(element).removeClass('border-danger');
-							$(element).addClass('border-success');					
-						});
-						
-						button = document.getElementById('compare-button');
-						$(button).removeClass('invisible');
-						/* set values for pm1 and pm2 inputs */
-						document.getElementById('pm1').value = pms[0];
-						document.getElementById('pm2').value = pms[1];
+				} else if (hasRedBorder($(this)) && activatedElements.length == 3) {
+					removeRedBorderFrom($(this));
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));
+					changeRedElementsToGreen();
+					showCompareButton();
+				} else if (hasGreenBorder($(this))) {
+					removeGreenBorderFrom($(this));
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));
+					if (activatedElements.length == 2){
+						changeRedElementsToGreen();
+						showCompareButton();
+						setComparisonValues();
 					} else {
-						button = document.getElementById('compare-button');
-						$(button).addClass('invisible');
+						hideCompareButton();
 					}
 				} else {
-					$(this).removeClass('clicked border border-success border-3');
-					$(this).addClass('not-clicked');
-					pms = pms.filter(e => e !== $(this).attr('id'));					
-					if (pms.length == 2){
-						elements = document.getElementsByClassName('clicked border border-danger border-3');
-						
-						Array.from(elements).forEach(function (element){
-							$(element).removeClass('border-danger');
-							$(element).addClass('border-success');					
-						});
-						
-						button = document.getElementById('compare-button');
-						$(button).removeClass('invisible');
-						/* set values for pm1 and pm2 inputs */
-						document.getElementById('pm1').value = pms[0];
-						document.getElementById('pm2').value = pms[1];
+					removeGreenBorderFrom($(this));
+					activatedElements = activatedElements.filter(e => e !== $(this).attr('id'));					
+					if (activatedElements.length == 2){
+						changeRedElementsToGreen();
+						showCompareButton();
+						setComparisonValues();
 					} else {
-						button = document.getElementById('compare-button');
-						$(button).addClass('invisible');
+						hideCompareButton();
 					}
 				}
 			});
