@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium import webdriver # the chromedriver.exe, which lives at C:\Users\andre, needs updating whenever the Chrome browser updates
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
@@ -49,19 +49,19 @@ def get_last_pm_contribution_index(soup):
             
     return last_pm_index
             
-def get_first_pmq(soup):
-    return get_first_pm_contribution_index(soup) - 1
+# def get_first_pmq(soup):
+    # return get_first_pm_contribution_index(soup) - 1
     
-def get_number_of_pm_contributions(soup):
-    contributions = soup.find_all(class_ = 'debate-item-contributiondebateitem')
-    start = get_first_pm_contribution_index(soup)
-    count = 0
-    for i in range(start, len(contributions)):
-        contributor = get_contributor(contributions[i])
-        if contributor == "The Prime Minister":
-            count += 1
+# def get_number_of_pm_contributions(soup):
+    # contributions = soup.find_all(class_ = 'debate-item-contributiondebateitem')
+    # start = get_first_pm_contribution_index(soup)
+    # count = 0
+    # for i in range(start, len(contributions)):
+        # contributor = get_contributor(contributions[i])
+        # if contributor == "The Prime Minister":
+            # count += 1
     
-    return count
+    # return count
     
 def get_pmq_contributions_raw(soup):
     contributions = soup.find_all(class_ = 'debate-item-contributiondebateitem')
@@ -83,22 +83,22 @@ def get_questions_and_answers(contributions):
     
     for i in range(len(contributions)):
         contribution = contributions[i]
-        if last_contribution_type != contribution.contribution_type:
+        if last_contribution_type != contribution.get_contribution_type():
             if skip_next_contribution:
                 skip_next_contribution = False
                 pass        
-            elif contribution.contribution_type == 'question':
+            elif contribution.get_contribution_type() == 'question':
                 questions_and_answers.append(contribution)
-            elif contribution.contribution_type == 'answer':
+            elif contribution.get_contribution_type() == 'answer':
                 questions_and_answers.append(contribution)
             else:
-                if contributions[i-1].contributor == contributions[i+1].contributor:
-                    contributions[i-1].concatenate_with(contributions[i+1].paragraph)
+                if contributions[i-1].get_contributor() == contributions[i+1].get_contributor():
+                    contributions[i-1].concatenate_with(contributions[i+1].get_paragraph())
                     skip_next_contribution = True
-        elif contribution.contribution_type == 'question':
+        elif contribution.get_contribution_type() == 'question':
             questions_and_answers[-1] = contribution
         
-        last_contribution_type = contribution.contribution_type
+        last_contribution_type = contribution.get_contribution_type()
             
     return questions_and_answers
 
@@ -107,12 +107,11 @@ def get_questions(questions_and_answers):
     previous_contribution_type = ''
     for i in range(len(questions_and_answers)):
         contribution = questions_and_answers[i]
-        if contribution.contribution_type == previous_contribution_type:
-            questions_and_answers[i-1].concatenate_with(contribution.paragraph)        
-        elif contribution.contribution_type == 'question':
+        if contribution.get_contribution_type() == previous_contribution_type:
+            questions_and_answers[i-1].concatenate_with(contribution.get_paragraph())        
+        elif contribution.get_contribution_type() == 'question':
             questions.append(contribution)
-        previous_contribution_type = contribution.contribution_type
-    
+        previous_contribution_type = contribution.get_contribution_type()
     return questions
 
 def get_answers(questions_and_answers):
@@ -120,11 +119,11 @@ def get_answers(questions_and_answers):
     previous_contribution_type = ''
     for i in range(len(questions_and_answers)):
         contribution = questions_and_answers[i]
-        if contribution.contribution_type == previous_contribution_type:
-            questions_and_answers[i-1].concatenate_with(contribution.paragraph)        
-        elif contribution.contribution_type == 'answer':
+        if contribution.get_contribution_type() == previous_contribution_type:
+            questions_and_answers[i-1].concatenate_with(contribution.get_paragraph())        
+        elif contribution.get_contribution_type() == 'answer':
             answers.append(contribution)
-        previous_contribution_type = contribution.contribution_type
+        previous_contribution_type = contribution.get_contribution_type()
     
     return answers
     
@@ -142,7 +141,7 @@ def insert_list_into_database(question_answer_pairs):
     sql = "INSERT INTO qa_pairs (question, author, answer, date) VALUES (%s, %s, %s, %s)"
     
     for pair in question_answer_pairs:
-        val = (pair[0].paragraph, pair[0].contributor, pair[1].paragraph, pair[0].date)
+        val = (pair[0].get_paragraph(), pair[0].get_contributor(), pair[1].get_paragraph(), pair[0].get_date())
         mycursor.execute(sql, val)
 
         mydb.commit()

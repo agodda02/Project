@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from datetime import date, datetime, timedelta
 
+#---------- FUNCTIONS ----------#
+
 def get_driver():
     options = Options()
     options.headless = True
@@ -48,8 +50,9 @@ def tuesday_or_thursday(date_to_check):
         date_to_check += timedelta(days = 5)
         
     return date_to_check
-
-start_time = datetime.now()
+ 
+ 
+#---------- MAIN PROGRAM ----------#
 
 date_to_check = date(1961, 7, 18) 
 move_to_wednesdays = date(1997, 5, 20)
@@ -77,6 +80,3 @@ while date_to_check <= end:
         pmq_sessions.clear()
 
 write_to_file(pmq_sessions)
-
-end_time = datetime.now()
-print('Duration: {}'.format(end_time - start_time))

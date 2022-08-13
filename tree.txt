@@ -1,0 +1,127 @@
+Folder PATH listing for volume Local Disk
+Volume serial number is 8A79-EF7E
+C:.
+¦   .gitignore
+¦   database.py
+¦   database.py.bak
+¦   sample.csv
+¦   sample2.csv
+¦   sample2.xlsx
+¦   tree.txt
+¦   
++---.pytest_cache
+¦   ¦   .gitignore
+¦   ¦   CACHEDIR.TAG
+¦   ¦   README.md
+¦   ¦   
+¦   +---v
+¦       +---cache
+¦               lastfailed
+¦               nodeids
+¦               stepwise
+¦               
++---Crawler
+¦   ¦   Contribution.py
+¦   ¦   Contribution.py.bak
+¦   ¦   full_scrape.py
+¦   ¦   pmq_links - in db.txt
+¦   ¦   pmq_links.txt
+¦   ¦   question_answer.py
+¦   ¦   question_answer.py.bak
+¦   ¦   test_question_answer.py
+¦   ¦   test_question_answer.py.bak
+¦   ¦   
+¦   +---.pytest_cache
+¦   ¦   ¦   .gitignore
+¦   ¦   ¦   CACHEDIR.TAG
+¦   ¦   ¦   README.md
+¦   ¦   ¦   
+¦   ¦   +---v
+¦   ¦       +---cache
+¦   ¦               lastfailed
+¦   ¦               nodeids
+¦   ¦               stepwise
+¦   ¦               
+¦   +---test_data
+¦   ¦       example_1961.txt
+¦   ¦       example_1962_07_05.txt
+¦   ¦       example_1963.txt
+¦   ¦       example_1975.txt
+¦   ¦       example_1980_04_24.txt
+¦   ¦       example_2022_06_15.txt
+¦   ¦       example_2022_06_22.txt
+¦   ¦       
+¦   +---__pycache__
+¦           Contribution.cpython-310.pyc
+¦           question_answer.cpython-310.pyc
+¦           test_question_answer.cpython-310-pytest-6.2.5.pyc
+¦           
++---Model
+¦   ¦   build_model.py
+¦   ¦   build_model.py.bak
+¦   ¦   dictionary
+¦   ¦   lda.model
+¦   ¦   lda.model.expElogbeta.npy
+¦   ¦   lda.model.id2word
+¦   ¦   lda.model.state
+¦   ¦   lda.model.state.sstats.npy
+¦   ¦   lsa.py
+¦   ¦   lsa_scikit.py
+¦   ¦   lsi.model
+¦   ¦   lsi.model.projection
+¦   ¦   lsi.model.projection.u.npy
+¦   ¦   pmq_stop_words.txt
+¦   ¦   print_topics.py
+¦   ¦   print_topics.py.bak
+¦   ¦   string_split.py
+¦   ¦   string_split.py.bak
+¦   ¦   use_model.py
+¦   ¦   use_model.py.bak
+¦   ¦   word_count.py
+¦   ¦   word_counts.txt
+¦   ¦   word_counts.xlsx
+¦   ¦   
+¦   +---__pycache__
+¦           string_split.cpython-310.pyc
+¦           
++---Website
+¦   ¦   app.py
+¦   ¦   app.py.bak
+¦   ¦   
+¦   +---static
+¦   ¦       adouglas-home.jpg
+¦   ¦       bjohnson.jpg
+¦   ¦       dcameron.jpg
+¦   ¦       eheath.jpg
+¦   ¦       gbrown.jpg
+¦   ¦       hmacmillan.jpg
+¦   ¦       hwilson.jpg
+¦   ¦       jcallaghan.jpg
+¦   ¦       jmajor.jpg
+¦   ¦       mthatcher.jpg
+¦   ¦       tblair.jpg
+¦   ¦       tmay.jpg
+¦   ¦       
+¦   +---templates
+¦   ¦       compare.html
+¦   ¦       compare.html.bak
+¦   ¦       comparison.html
+¦   ¦       index.html
+¦   ¦       result.html
+¦   ¦       results.html
+¦   ¦       search.html
+¦   ¦       search.html.bak
+¦   ¦       upload.html
+¦   ¦       
+¦   +---__pycache__
++---__pycache__
+        Contribution.cpython-310.pyc
+        database.cpython-310.pyc
+        full_scrape.cpython-310.pyc
+        question_answer.cpython-310.pyc
+        string_split.cpython-310.pyc
+        test_contribution.cpython-310-pytest-6.2.5.pyc
+        test_question_answer.cpython-310-pytest-6.2.5.pyc
+        test_weekday.cpython-310-pytest-6.2.5.pyc
+        weekday.cpython-310.pyc
+        
