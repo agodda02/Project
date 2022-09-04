@@ -70,11 +70,15 @@ def search():
     cursor.execute('SELECT id, name, startdate, enddate FROM primeministers')
     primeministers = cursor.fetchall()
     
+    for pm in primeministers:
+        if pm['enddate'] == None:
+            pm['enddate'] = date.today()
+    
     return render_template('search.html', primeministers=primeministers)
     
 @app.route("/results", methods=['POST'])
 def results():
-    pm_id = request.form[list(request.form.to_dict().keys())[0]]
+    pm_id = request.form[list(request.form.to_dict().keys())[0]]    
     datefrom = date.fromisoformat(request.form['from'])
     dateto = date.fromisoformat(request.form['to'])
 
@@ -84,15 +88,19 @@ def results():
     pm = cursor.fetchone()
     
     cursor.execute('SELECT AVG(answer_relevance) AS Average FROM qa_pairs WHERE pm=%s and date >= %s and date <= %s', (pm_id, datefrom, dateto))
-    average = f"{cursor.fetchone()['Average']:.2%}"
+    average = cursor.fetchone()['Average']
     
+    # Catching the instance where the user chooses a date range that has no session
+    if average == None:
+        return render_template('error.html')
+        
     cursor.execute('SELECT author, date, question, answer, answer_relevance FROM qa_pairs WHERE pm=%s and date >= %s and date <= %s', (pm_id, datefrom, dateto))
     data = cursor.fetchall()
     
     for items in data:
         items['answer_relevance'] = f"{items['answer_relevance']:.2%}"
     
-    return render_template('results.html', average=average, pm=pm, data=data, datefrom=datefrom.strftime("%A %d %B %Y"), dateto=dateto.strftime("%A %d %B %Y"))
+    return render_template('results.html', average=f"{average:.2%}", pm=pm, data=data, datefrom=datefrom.strftime("%A %d %B %Y"), dateto=dateto.strftime("%A %d %B %Y"))
 
 @app.route("/compare")
 def compare():
@@ -126,8 +134,8 @@ def upload():
     
 @app.route("/result", methods=['POST'])
 def result():
-    lsi = LsiModel.load("../Model/lsi.model")
-    # lsi = LdaModel.load("../Model/lda.model")
+    model = LsiModel.load("../Model/lsi.model")
+    # model = LdaModel.load("../Model/lda.model")
     dictionary = corpora.Dictionary.load("../Model/dictionary")
     
     question = request.form['question']
@@ -159,8 +167,8 @@ def result():
     answer_split = string_split.split_contribution(answer.lower(), "../Model/pmq_stop_words.txt")
     question_bow = dictionary.doc2bow(question_split)
     answer_bow = dictionary.doc2bow(answer_split)
-    question_lsi = lsi[question_bow]
-    answer_lsi = lsi[answer_bow]
+    question_lsi = model[question_bow]
+    answer_lsi = model[answer_bow]
         
     c = matutils.sparse2full(question_lsi, 300)
     d = matutils.sparse2full(answer_lsi, 300)

@@ -1,13 +1,19 @@
 from gensim import corpora, matutils
 from gensim.models import LsiModel
+# from gensim.models import LdaModel
 import string_split
 import numpy as np
+
+# If KeyBERT is being used
+# from keybert import KeyBERT
+# from nltk.corpus import stopwords
 
 import sys
 sys.path.append("..")
 import database as db
 
-lsi = LsiModel.load("lsi.model")
+model = LsiModel.load("lsi.model")
+# model = LdaModel.load("lda.model")
 dictionary = corpora.Dictionary.load("dictionary")
 
 mydb = db.connect()
@@ -17,18 +23,43 @@ select = "select * from qa_pairs"
 mycursor.execute(select)
 updates = list()
 
+# If KeyBERT is used...
+# stop_words = set(stopwords.words('english'))
+# additional = list()
+
+# with open("../Model/pmq_stop_words.txt", "r") as f:
+        # for line in f.readlines():
+            # additional.append(line.strip())
+
+# stop_words.update(additional)
+
 for row in mycursor:
     index = row[0]
     question = row[1]
     answer = row[3]
     answer_relevance = row[5]
+    
+    # For KeyBERT
+    # kw_model = KeyBERT()
+    # question_keywords = kw_model.extract_keywords(question, stop_words=stop_words)
+    # answer_keywords = kw_model.extract_keywords(answer, stop_words=stop_words)
+    
+    # question_split = list()
+    # for keyword in question_keywords:
+        # question_split.append(keyword[0])
+
+    # answer_split = list()
+    # for keyword in answer_keywords:
+        # answer_split.append(keyword[0])
+    
     question_split = string_split.split_contribution(question.lower(), "pmq_stop_words.txt")
     answer_split = string_split.split_contribution(answer.lower(), "pmq_stop_words.txt")
+    
     print(index)
     question_bow = dictionary.doc2bow(question_split)
     answer_bow = dictionary.doc2bow(answer_split)
-    question_lsi = lsi[question_bow]
-    answer_lsi = lsi[answer_bow]
+    question_lsi = model[question_bow]
+    answer_lsi = model[answer_bow]
 
     c = matutils.sparse2full(question_lsi, 300)
     d = matutils.sparse2full(answer_lsi, 300)

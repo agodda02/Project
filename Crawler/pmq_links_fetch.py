@@ -23,7 +23,7 @@ def write_to_file(pmq_sessions):
         for pmq_session in pmq_sessions:
             f.writelines(pmq_session+'\n')
 
-def update_tuesday_or_thursday(date_to_check):
+def update(date_to_check):
     day_of_week = date_to_check.strftime('%A')
     
     if day_of_week == "Tuesday":
@@ -44,7 +44,7 @@ pmq_sessions = list()
 while date_to_check <= move_to_wednesdays:    
     links = get_links(date_to_check)
     update_pmq_sessions_list(links)
-    date_to_check = update_tuesday_or_thursday(date_to_check)
+    date_to_check = update(date_to_check)
 
     if len(pmq_sessions) == 200:
         write_to_file(pmq_sessions)
