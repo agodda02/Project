@@ -12,14 +12,14 @@ import MySQLdb.cursors
 from datetime import date
 
 # Used to load in the LSI Model
-from gensim.models import LsiModel
+# from gensim.models import LsiModel
 
 # Used to load in the LDA model, if used
-# from gensim.models import LdaModel
+from gensim.models import LdaModel
 
 # If KeyBERT is being used
-# from keybert import KeyBERT
-# from nltk.corpus import stopwords
+from keybert import KeyBERT
+from nltk.corpus import stopwords
 
 # Used to calculate the cosine similarity
 from gensim import corpora, matutils
@@ -46,7 +46,8 @@ app.config['MYSQL_HOST'] = host
 app.config['MYSQL_USER'] = user
 app.config['MYSQL_PASSWORD'] = password
 app.config['MYSQL_DB'] = database
-mysql = MySQL(app)
+mysql = MySQL(app)      
+
 
 @app.route("/")
 def main():
@@ -93,7 +94,7 @@ def results():
     # Catching the instance where the user chooses a date range that has no session
     if average == None:
         return render_template('error.html')
-        
+
     cursor.execute('SELECT author, date, question, answer, answer_relevance FROM qa_pairs WHERE pm=%s and date >= %s and date <= %s', (pm_id, datefrom, dateto))
     data = cursor.fetchall()
     
@@ -134,37 +135,37 @@ def upload():
     
 @app.route("/result", methods=['POST'])
 def result():
-    model = LsiModel.load("../Model/lsi.model")
-    # model = LdaModel.load("../Model/lda.model")
+    # model = LsiModel.load("../Model/lsi.model")
+    model = LdaModel.load("../Model/lda.model")
     dictionary = corpora.Dictionary.load("../Model/dictionary")
     
     question = request.form['question']
     answer = request.form['answer']
 
     # If KeyBERT is used...
-    # stop_words = set(stopwords.words('english'))
-    # additional = list()
+    stop_words = set(stopwords.words('english'))
+    additional = list()
 
-    # with open("../Model/pmq_stop_words.txt", "r") as f:
-            # for line in f.readlines():
-                # additional.append(line.strip())
+    with open("../Model/pmq_stop_words.txt", "r") as f:
+            for line in f.readlines():
+                additional.append(line.strip())
     
-    # stop_words.update(additional)
+    stop_words.update(additional)
     
-    # kw_model = KeyBERT()
-    # question_keywords = kw_model.extract_keywords(question, stop_words=stop_words)
-    # answer_keywords = kw_model.extract_keywords(answer, stop_words=stop_words)
+    kw_model = KeyBERT()
+    question_keywords = kw_model.extract_keywords(question, stop_words=stop_words, top_n=2)
+    answer_keywords = kw_model.extract_keywords(answer, stop_words=stop_words, top_n=2)
     
-    # question_split = list()
-    # for keyword in question_keywords:
-        # question_split.append(keyword[0])
+    question_split = list()
+    for keyword in question_keywords:
+        question_split.append(keyword[0])
 
-    # answer_split = list()
-    # for keyword in answer_keywords:
-        # answer_split.append(keyword[0])
+    answer_split = list()
+    for keyword in answer_keywords:
+        answer_split.append(keyword[0])
     
-    question_split = string_split.split_contribution(question.lower(), "../Model/pmq_stop_words.txt")
-    answer_split = string_split.split_contribution(answer.lower(), "../Model/pmq_stop_words.txt")
+    # question_split = string_split.split_contribution(question.lower(), "../Model/pmq_stop_words.txt")
+    # answer_split = string_split.split_contribution(answer.lower(), "../Model/pmq_stop_words.txt")
     question_bow = dictionary.doc2bow(question_split)
     answer_bow = dictionary.doc2bow(answer_split)
     question_lsi = model[question_bow]
@@ -173,17 +174,17 @@ def result():
     c = matutils.sparse2full(question_lsi, 300)
     d = matutils.sparse2full(answer_lsi, 300)
 
-    try:
-        dot_product = np.dot(c, d)
-        norm_c = np.linalg.norm(c)
-        norm_d = np.linalg.norm(d)       
-        sim = dot_product / (norm_c * norm_d)
-        if sim < 0:
-            sim = 0
-    except:
+    dot_product = np.dot(c, d)
+    norm_c = np.linalg.norm(c)
+    norm_d = np.linalg.norm(d)       
+    sim = dot_product / (norm_c * norm_d)
+    if sim < 0:
         sim = 0
         
     relevance = f"{round(sim, 4):.2%}"
+    
+    if relevance == 'nan%':
+        relevance = '100%'
     
     return render_template('result.html', question=question, answer=answer, relevance=relevance)
     

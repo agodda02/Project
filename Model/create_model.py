@@ -2,6 +2,7 @@ from gensim import corpora, models
 from gensim.models import LsiModel
 # from gensim.models import LdaModel
 import string_split
+import numpy
 
 import sys
 sys.path.append("..")
@@ -30,13 +31,9 @@ corpus = [dictionary.doc2bow(contribution, allow_update=True) for contribution i
 tfidf = models.TfidfModel(corpus)
 corpus_tfidf = tfidf[corpus]
 
-print(tfidf)
-print(corpus_tfidf)
-input()
-
 print("Getting model")
 lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=300)
-# lda = LdaModel(corpus_tfidf, id2word=dictionary, num_topics=300)
+# lda = LdaModel(corpus, num_topics=300)
 
 print("Saving the model and dictionary")
 lsi.save("lsi.model")

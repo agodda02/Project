@@ -19,7 +19,7 @@ def update_pmq_sessions_list(links):
                 pmq_sessions.append(check_link)        
                 
 def write_to_file(pmq_sessions):
-    with open("pmq_links.txt", "w") as f:
+    with open("pmq_links.txt", "a") as f:
         for pmq_session in pmq_sessions:
             f.writelines(pmq_session+'\n')
 
